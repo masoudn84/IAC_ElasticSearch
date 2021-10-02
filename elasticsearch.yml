@@ -1,0 +1,38 @@
+---
+- hosts: elasticsearch
+  gather_facts: no
+
+  tasks:
+
+  - name: Pre-download elasticsearch install package
+    yum:
+      name: 
+      #  - java-1.8.0-openjdk
+        - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.12.1-x86_64.rpm
+      
+      state: present
+    tags: install
+     # when: version_found.stdout is version_compare(elk_version, '<')
+
+- hosts: kibana
+  gather_facts: no
+
+  tasks:
+  - name: Validate kibana Version
+    fail: msg="Invalid ELK Version"
+    when: elk_version is undefined or not elk_version is match("\d+\.\d+\.\d+")
+
+  - name: Get kibana current version
+    command: rpm -q kibana --qf %{VERSION}
+    args:
+      warn: no
+    changed_when: False
+    register: version_found
+    ignore_errors: yes
+
+  - name: Pre-download kibana install package
+    yum:
+      name: kibana-{{ elk_version }}
+      download_only: yes
+    when: version_found.stdout is version_compare(elk_version, '<')
+

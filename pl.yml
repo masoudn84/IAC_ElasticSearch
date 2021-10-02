@@ -1,0 +1,49 @@
+---
+##check install java
+##use variable
+##check roles
+
+- name: install elasticsearch
+  hosts: elasticsearch
+  serial: 3
+  gather_facts: false
+  vars:
+      cluster_name: 'elastic-cluster'
+      node_name: '{{ ansible_ssh_host }}'
+      network_host: '{{ ansible_ssh_host }}'
+      node_master: "{{ 'master' if 'master' in group_names}},"
+      node_data: "{{ 'data' if 'data' in group_names}},"
+      discovery_zen_ping_unicast_hosts: '"192.168.75.33","192.168.758.32","192.168.75.31"'    
+      discovery_zen_minimum_master_nodes: '2'
+
+      Xms: '4096m'
+      Xmx: '8192m'
+      path_data: '/var/lib/elasticsearch/data'
+      http_port: '9200'
+      discovery_seed_hosts: '"192.168.75.31","192.168.75.32","192.168.75.33"'
+      bootstrap_memory_lock: 'true'
+
+      es_heap_size: "4g"
+      es_config:
+        node_ingest: false
+        node_ml: false
+        cluster_remote_connect: false
+        
+  # tasks:
+  #   - debug:
+  #       msg: "echo master {{ node_master }}"
+        
+  #     tags: debug 
+  #   - debug:
+        
+  #       msg: "echo data {{ node_data }}"
+  #     tags: debug
+  roles:
+    - remove
+    - install
+    - firewall
+    - config
+    - service
+    - service
+      
+

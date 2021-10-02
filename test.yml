@@ -1,0 +1,17 @@
+---
+- name: install elasticsearch
+  hosts: elasticsearch
+  serial: 3
+  gather_facts: false
+  vars:
+      node_master: "{{ 'master' if 'master' in group_names else 'false'}},"
+      node_data: "{{ 'data' if 'data' in group_names else 'false' }},"
+
+        
+  tasks:
+    
+    - name: 
+      template:
+        src: /root/elasticsearch-roles/templates/test.yml.j2
+        dest: /root
+        
